@@ -1,7 +1,10 @@
 import os
 import shutil
 import getpass
+import configparser
 from typing import List
+# from tkinter import Tk
+from tkinter.filedialog import askdirectory
 
 User = getpass.getuser()
 path = ('C:/Users/' + User + '/Downloads/')
@@ -11,6 +14,7 @@ subNames = os.listdir(subPath)
 folder_name: List[str] = ['Programs Installers', 'Books', 'Pics', 'Documents', 'AHK Scripts', 'RARs',
                           'Cheat tables', 'SC2 Banks and Replays']
 folderSubNames: List[str] = ['Excels', 'Word', 'PDFs', 'Logs', 'Text Files', 'Power Points']
+
 #                fileExtension: 'locations'
 fileTypeDict = {"exe": 'Programs Installers/',
                 "msi": 'Programs Installers/',
@@ -33,6 +37,28 @@ fileTypeDict = {"exe": 'Programs Installers/',
                 "txt": 'Documents/Text Files/'
                 }
 
+if os.path.exists(path) is False:
+    if os.path.exists("Auto_sorter_configfile.ini"):
+        config_obj = configparser.ConfigParser()
+        config_obj.read("Auto_sorter_configfile.ini")
+        filLocation = config_obj['File Location']
+        path = filLocation["path"]
+        subPath = filLocation["subPath"]
+    else:
+        print(f'Unable to locate folder {path}')
+        path = askdirectory(title='Select Your Downloads folder')
+        path = str(path + "/")
+        subPath = (path + 'Documents/')
+        config = configparser.ConfigParser()
+        config.add_section('File Location')
+        config.set('File Location', 'path', path)
+        config.set('File Location', 'subPath', subPath)
+        try:
+            with open("Auto_sorter_configfile.ini", 'w') as configfile:
+                config.write(configfile)
+        except PermissionError as err:
+            print(err)
+
 for fol_nam in folder_name:
     if not os.path.exists(path + fol_nam):
         os.makedirs(path + fol_nam)
@@ -46,7 +72,7 @@ for file_name in names:
     x = 1
     if files in fileTypeDict.keys():
         locations = fileTypeDict.get(files)
-        if os.path.exists(path + locations + file_name): # file is in location
+        if os.path.exists(path + locations + file_name):  # file is in location
             fileVar = file_name.split(".")
             file_name2 = str(fileVar[0]) + "(" + str(x) + ")" + "." + str(files)
             while True:

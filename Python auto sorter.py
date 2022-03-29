@@ -1,19 +1,20 @@
 import configparser
-import getpass
+#import getpass
 import os
 import shutil
 import filecmp
 from tkinter.filedialog import askdirectory
 
-User = getpass.getuser()
+#User = getpass.getuser()
+User = os.path.expanduser('~')
 try:
-    path = ('C:/Users/' + User + '/Downloads/')
+    path = (User + '/Downloads/')
     subPath = (path + 'Documents/')
     names = os.listdir(path)
     subNames = os.listdir(subPath)
 except FileNotFoundError as err:
-    print(err)
-folderName = ['Programs Installers', 'Books', 'Pics', 'Documents', 'AHK Scripts', 'RARs']
+    print(f'Unable to auto find your downloads folder! Error:{err}')
+folderName = ['Programs Installers', 'Books', 'Pics', 'Documents', 'AHK Scripts', 'RARs', 'Audio and Video']
 folderSubNames = ['Excels', 'Word', 'PDFs', 'Logs', 'Text Files', 'Power Points']
 
 # Structure for the dictionary is as follows:
@@ -24,11 +25,17 @@ fileTypeDict = {"exe": 'Programs Installers/',
                 "epub": 'Books/',
                 "png": 'Pics/',
                 "jpg": 'Pics/',
+                "jfif": 'Pics/',
+                "gif": 'Pics/',
                 "ahk": 'AHK Scripts/',
                 "rar": 'RARs/',
                 "zip": 'RARs/',
                 "7z": 'RARs/',
-                "ct": 'Cheat tables/',
+                "m4a": 'Audio and Video/',
+                "mp3": 'Audio and Video/',
+                "mp4": 'Audio and Video/',
+                "wav": 'Audio and Video/',
+                "xls": 'Documents/Excels/',
                 "xlsx": 'Documents/Excels/',
                 "xlsm": 'Documents/Excels/',
                 "csv": 'Documents/Excels/',
@@ -36,11 +43,13 @@ fileTypeDict = {"exe": 'Programs Installers/',
                 "docx": 'Documents/Word/',
                 "pdf": 'Documents/PDFs/',
                 "log": 'Documents/Logs/',
-                "ppt": 'Documents/Power Points/',
-                "txt": 'Documents/Text Files/'
+                "pptx": 'Documents/Power Points/',
+                "txt": 'Documents/Text Files/',
+                "rtf": 'Documents/Text Files/'
                 }
+# Check the normal file path and if not found allowing selection of it
+if os.path.exists(path) is False:  # set true to pick your own location
 
-if os.path.exists(path) is False:  # Check the normal file path and if not allowing selection of it; set true to pick
     if os.path.exists("Auto_sorter_configfile.ini"):  # checks for the ini file and loads it
         config_obj = configparser.ConfigParser()
         config_obj.read("Auto_sorter_configfile.ini")
@@ -79,6 +88,7 @@ for file_name in names:
     x = 1
     if files in fileTypeDict.keys():
         locations = fileTypeDict.get(files)
+        # print(f'{path} + {locations} + {file_name}')
         if os.path.exists(path + locations + file_name):  # file is in location
             if filecmp.cmp(path + file_name, path + locations + file_name, shallow=False) is False:
                 fileVar = file_name.split(".")

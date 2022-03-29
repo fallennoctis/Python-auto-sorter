@@ -6,10 +6,13 @@ import filecmp
 from tkinter.filedialog import askdirectory
 
 User = getpass.getuser()
-path = ('C:/Users/' + User + '/Downloads/')
-subPath = (path + 'Documents/')
-names = os.listdir(path)
-subNames = os.listdir(subPath)
+try:
+    path = ('C:/Users/' + User + '/Downloads/')
+    subPath = (path + 'Documents/')
+    names = os.listdir(path)
+    subNames = os.listdir(subPath)
+except FileNotFoundError as err:
+    print(err)
 folderName = ['Programs Installers', 'Books', 'Pics', 'Documents', 'AHK Scripts', 'RARs']
 folderSubNames = ['Excels', 'Word', 'PDFs', 'Logs', 'Text Files', 'Power Points']
 
@@ -44,11 +47,15 @@ if os.path.exists(path) is False:  # Check the normal file path and if not allow
         filLocation = config_obj['File Location']
         path = filLocation["path"]
         subPath = filLocation["subPath"]
+        names = os.listdir(path)
+        subNames = os.listdir(subPath)
     else:  # if needed creates the file for the config
         print(f'Unable to locate folder {path}')
         path = askdirectory(title='Select Your Downloads folder')
         path = str(path + "/")
         subPath = (path + 'Documents/')
+        names = os.listdir(path)
+        subNames = os.listdir(subPath)
         config = configparser.ConfigParser()
         config.add_section('File Location')
         config.set('File Location', 'path', path)
@@ -90,11 +97,11 @@ for file_name in names:
                         except PermissionError as err:
                             print(err)
                     break
-            else:
-                try:
-                    shutil.move(path + file_name, path + locations + file_name)
-                except PermissionError as err:
-                    print(err)
+        else:
+            try:
+                shutil.move(path + file_name, path + locations + file_name)
+            except PermissionError as err:
+                print(err)
     elif file_name in folderName or file_name in folderSubNames or file_name == "desktop.ini":
         pass
     else:
